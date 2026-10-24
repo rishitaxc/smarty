@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maintenance Report WO-2491</title>
+<style>
+:root{--ink:#16202b;--muted:#5b6877;--line:#dfe4ea;--hot:#c4372e;--ok:#1d6b45;--bg:#f6f7f9}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ink:#16202b;--bg:#f6f7f9}}
+:root[data-theme="dark"]{--ink:#16202b;--bg:#f6f7f9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;line-height:1.5}
+.page{max-width:880px;margin:24px auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:36px 40px}
+header{display:flex;align-items:flex-start;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:16px}
+header h1{margin:0;font-size:26px}
+header .meta{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted)}
+header .crew{margin-left:auto;display:flex}
+header .crew span{width:44px;height:44px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:26px 0 8px}
+.sum{font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.box{border:1px solid var(--line);border-radius:10px;padding:12px}
+.box b{display:block;font-size:24px}
+.box.hot b{color:var(--hot)}.box.ok b{color:var(--ok)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;word-break:break-all}
+.foot{margin-top:24px;font-size:12px;color:var(--muted)}
+.bar{max-width:880px;margin:16px auto 0;display:flex;justify-content:flex-end;padding:0 16px}
+.bar button{border:0;background:var(--ink);color:#fff;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+@media (max-width:640px){.page{padding:20px 16px;margin:12px}.grid{grid-template-columns:1fr}}
+@media print{.bar{display:none}.page{border:0;margin:0}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="bar"><button onclick="print()">Save as PDF</button></div>
+<div class="page" id="root"><p>No report yet. Run the demo first.</p></div>
+<script>
+const inr = (x) => "₹" + Math.round(x).toLocaleString("en-IN");
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+let R = null;
+try { R = JSON.parse(localStorage.getItem("sidekick-report")); } catch {}
+if (R && R.scout && R.bolt) {
+  const d = R.scout.diagnosis, w = R.bolt.work_order, roi = R.roi || {};
+  const approved = (R.audit || []).filter((a) => a.action === "APPROVED").pop();
+  document.getElementById("root").innerHTML = `
+  <header><div><h1>Maintenance report · WO-2491</h1>
+    <div class="meta">${esc(w.asset)} · generated ${new Date(R.generatedAt).toLocaleString("en-GB")} · Sidekick crew: Pip, Scout, Bolt, Gate</div></div></header>
+  <h2>Summary</h2><p class="sum">${esc(R.pip?.report_summary || R.scout.headline)}</p>
+  <div class="grid">
+    <div class="box hot"><span>Diagnosis</span><b>${esc(d.component)}</b>${d.days_to_failure} days to failure · ${Math.round(d.confidence * 100)}% confidence</div>
+    <div class="box"><span>Planned repair</span><b>${inr(w.total_cost_inr)}</b>${esc(w.window_start.replace("T", " "))} → ${esc(w.window_end.slice(11))}</div>
+    <div class="box ok"><span>Avoided loss (est.)</span><b>${inr(roi.saved || 0)}</b>vs ~${roi.days || 42} days unplanned outage</div>
+  </div>
+  <h2>Evidence (Scout)</h2>
+  <table><tr><th>ID</th><th>Finding</th><th>Source</th></tr>
+    ${R.scout.evidence.map((e) => `<tr><td>${esc(e.id)}</td><td><b>${esc(e.title)}</b><br>${esc(e.detail)}</td><td>${esc(e.source)}</td></tr>`).join("")}</table>
+  <p>${esc(d.reasoning)}</p>
+  <h2>Work order (Bolt)</h2>
+  <table><tr><td>Part</td><td>${esc(w.part_sku)} · ${esc(w.part_name)} × ${w.quantity}</td></tr>
+    <tr><td>Technicians</td><td>${esc(w.technicians.join(", "))}</td></tr>
+    <tr><td>Window</td><td>${esc(w.window_start)} → ${esc(w.window_end)} · lost energy ${inr(w.energy_loss_inr)}</td></tr>
+    ${w.cost_breakdown.map((c) => `<tr><td>${esc(c.item)}</td><td>${inr(c.inr)}</td></tr>`).join("")}
+    <tr><td><b>Total</b></td><td><b>${inr(w.total_cost_inr)}</b></td></tr></table>
+  <p>${esc(w.justification)}</p>
+  <h2>Approval and audit trail (Gate)</h2>
+  <p>${approved ? `Approved by <b>${esc(approved.role)}</b> at ${new Date(approved.ts).toLocaleString("en-GB")} with biometric confirmation.` : "Not approved."}</p>
+  <table><tr><th>Time</th><th>Actor</th><th>Action</th><th>Hash ← previous</th></tr>
+    ${(R.audit || []).map((a) => `<tr><td>${a.ts.slice(11, 19)}</td><td>${esc(a.actor)}</td><td>${esc(a.action)} · ${esc(a.detail)}</td><td class="mono">${a.hash.slice(0, 20)}… ← ${a.prev.slice(0, 12)}…</td></tr>`).join("")}</table>
+  <div class="foot">Telemetry: ${esc(R.sources?.dataset)} (${esc(R.sources?.url)}); fault injected for demonstration. Operations records are synthetic.
+  Avoided loss = T-04 average output ${roi.avgKw} kW × 24 h × ${roi.days} days × ${inr(roi.tariff)}/kWh − planned cost and lost energy; excludes gearbox replacement cost.</div>`;
+}
+</script>
+</body>
+</html>

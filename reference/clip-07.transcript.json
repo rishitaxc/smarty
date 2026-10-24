@@ -1,0 +1,12 @@
+{
+  "text": "Each time, the target is always the next token. These are practice questions and answers, ready for training.",
+  "languages": [
+    {
+      "code": "en"
+    }
+  ],
+  "usage": {
+    "type": "duration",
+    "seconds": 8
+  }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northwind Ridge SCADA</title>
+<style>
+:root{--line:#e2e3e3;--head:#f8f9fa;--ink:#1f1f1f;--muted:#5f6368;--sel:#1a73e8;--bar:62px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ink:#1f1f1f}}
+:root[data-theme="dark"]{--ink:#1f1f1f}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff;color:var(--ink);font:13px Arial,Helvetica,sans-serif}
+header{position:fixed;left:0;right:0;top:0;height:var(--bar);background:#f9fbfd;border-bottom:1px solid #dadce0;display:flex;align-items:center;gap:14px;padding:0 16px;z-index:5}
+.logo{width:28px;height:36px;border-radius:4px;background:#0f9d58;position:relative}
+.logo:after{content:"";position:absolute;left:6px;right:6px;top:12px;bottom:8px;border:2px solid #fff;border-radius:1px}
+.title{font-size:18px}
+.menu{font-size:13px;color:var(--muted);display:flex;gap:14px;margin-top:4px}
+.src{margin-left:auto;font-size:11px;color:var(--muted);max-width:520px;text-align:right}
+main{padding-top:var(--bar)}
+table{border-collapse:separate;border-spacing:0}
+th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);height:21px;padding:0 8px;white-space:nowrap}
+td{text-align:right;min-width:74px}
+td.d{text-align:left;min-width:86px}
+th{background:var(--head);color:var(--muted);font-weight:400;font-size:11px;position:sticky;top:var(--bar);z-index:3}
+tr.h td{position:sticky;top:calc(var(--bar) + 22px);background:#fff;font-weight:700;text-align:center;z-index:2;border-bottom:2px solid #c7c7c7}
+.rn{background:var(--head);color:var(--muted);text-align:center;min-width:42px;font-size:11px;position:sticky;left:0;z-index:1}
+th.rn{z-index:4}
+tr.h td.rn{z-index:4;background:var(--head);font-weight:400}
+.tabs{position:fixed;left:0;right:0;bottom:0;height:34px;background:#f9fbfd;border-top:1px solid #dadce0;display:flex;align-items:center;gap:4px;padding:0 50px;z-index:5}
+.tabs span{cursor:pointer;padding:6px 14px;border-radius:6px 6px 0 0;color:var(--muted);font-size:12px}
+.tabs span.on{background:#e1e9f7;color:#0b57d0;font-weight:700}
+footer{height:40px}
+</style>
+</head>
+<body>
+<header><div class="logo"></div><div><div class="title" id="fname">Northwind_Ridge_SCADA_daily.xlsx</div><div class="menu"><span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Data</span></div></div><div class="src" id="src"></div></header>
+<main><table id="t"></table></main>
+<footer></footer>
+<div class="tabs" id="tabs"></div>
+<script>
+// ?ds=cnc | transformer | pump loads another engineering dataset; default is the wind farm.
+const ds = new URLSearchParams(location.search).get("ds");
+fetch(ds ? `data/sheet_${ds}.json` : "data/sheet_daily.json").then((r) => r.json()).then((d) => {
+  document.getElementById("src").textContent = d.source;
+  if (d.file) { document.getElementById("fname").textContent = d.file; document.title = d.file.replace(/_/g, " ").replace(".xlsx", ""); }
+  const tabs = d.tabs || [{ k: "vib", title: "Drive-train vibration (mm/s²)" }, { k: "oil", title: "Gear oil temp (°C)" }, { k: "power", title: "Power (kW)" }];
+  document.getElementById("tabs").innerHTML = tabs.map((t) => `<span data-k="${t.k}">${t.title}</span>`).join("");
+  const T = d.turbines, letters = "ABCDEFGHIJ";
+  const show = (k) => {
+    let h = `<tr><th class="rn"></th>${["Date", ...T].map((_, i) => `<th>${letters[i]}</th>`).join("")}</tr>`;
+    h += `<tr class="h"><td class="rn">1</td><td class="d">Date</td>${T.map((t) => `<td>${t}</td>`).join("")}</tr>`;
+    d.labels.forEach((lb, i) => { h += `<tr><td class="rn">${i + 2}</td><td class="d">${lb}</td>${T.map((t) => `<td>${d[k][t][i]}</td>`).join("")}</tr>`; });
+    document.getElementById("t").innerHTML = h;
+    document.querySelectorAll("#tabs span").forEach((s) => s.classList.toggle("on", s.dataset.k === k));
+    scrollTo(0, 0);
+  };
+  document.querySelectorAll("#tabs span").forEach((s) => (s.onclick = () => show(s.dataset.k)));
+  show(tabs[0].k);
+});
+</script>
+</body>
+</html>

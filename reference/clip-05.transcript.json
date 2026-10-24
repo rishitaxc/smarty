@@ -1,0 +1,12 @@
+{
+  "text": "Actually, though, can you explain to me how this is, how this works? Is this like a derivative? How did you get this answer? Explain it to me. Yes. He's finding a derivative, how fast this expression changes. First, square and scale x, then take the natural logarithm. The logarithm's derivative is one divided by whatever is inside. The inside's derivative...",
+  "languages": [
+    {
+      "code": "en"
+    }
+  ],
+  "usage": {
+    "type": "duration",
+    "seconds": 27
+  }
+}

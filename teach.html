@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Side, Explained</title>
+<style>
+:root{
+  --bg:#f6f5f1; --bg2:#ecebe5; --card:#ffffff; --line:#dcdad2; --text:#1d2124; --muted:#5b6268; --dim:#8a9096;
+  --accent:#2f6f5a; --accent-soft:#e3efe9; --blue:#3366bf; --amber:#b9821a; --red:#c4473f; --violet:#7a5bb8;
+  --code-bg:#f0efe9; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c0f12; --bg2:#12171c; --card:#151b21; --line:#26303a; --text:#e7ecf0; --muted:#9aa5b0; --dim:#6c7783;
+  --accent:#7cd6b0; --accent-soft:#163128; --blue:#7fb0ff; --amber:#f0bf5a; --red:#ff7f74; --violet:#b9a0ff; --code-bg:#10151a;
+}}
+:root[data-theme="dark"]{
+  --bg:#0c0f12; --bg2:#12171c; --card:#151b21; --line:#26303a; --text:#e7ecf0; --muted:#9aa5b0; --dim:#6c7783;
+  --accent:#7cd6b0; --accent-soft:#163128; --blue:#7fb0ff; --amber:#f0bf5a; --red:#ff7f74; --violet:#b9a0ff; --code-bg:#10151a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;overflow-x:hidden}
+a{color:var(--accent)}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header.hero{padding:64px 0 40px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.05;letter-spacing:-.02em;margin:12px 0 16px}
+h2{font-size:clamp(24px,3.6vw,34px);line-height:1.15;letter-spacing:-.01em;margin:6px 0 14px}
+h3{font-size:18px;margin:22px 0 6px}
+p{margin:0 0 12px}
+.lede{font-size:19px;color:var(--muted);max-width:680px}
+section{padding:48px 0;border-top:1px solid var(--line)}
+code,kbd{font-family:var(--mono);font-size:.88em;background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre{font-family:var(--mono);font-size:13px;line-height:1.5;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:10px 0 16px}
+pre code{background:none;border:0;padding:0}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.grid .card{margin:0}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-right:6px}
+.tag.amber{background:color-mix(in srgb,var(--amber) 16%,transparent);color:var(--amber)}
+.tag.blue{background:color-mix(in srgb,var(--blue) 16%,transparent);color:var(--blue)}
+.tag.red{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}
+.tag.violet{background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+.callout.warn{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 12%,transparent)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0 16px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.table-scroll{overflow-x:auto}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+nav.toc a{font-size:14px;text-decoration:none;border:1px solid var(--line);background:var(--card);color:var(--text);padding:6px 12px;border-radius:99px}
+nav.toc a:hover{border-color:var(--accent)}
+.tree{font-family:var(--mono);font-size:13px;line-height:1.7}
+.tree .d{color:var(--blue);font-weight:600}
+.tree .c{color:var(--dim)}
+button{font:inherit;font-size:14px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--text);padding:7px 14px;border-radius:9px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+/* lifecycle stepper */
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.steps button{font-size:13px;padding:6px 10px}
+.steps button.on{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.step-panel{min-height:150px}
+.step-panel .where{font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:10px}
+/* widgets */
+canvas{width:100%;height:auto;display:block;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+input[type=range]{flex:1;min-width:160px;accent-color:var(--accent)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.chain{display:flex;flex-direction:column;gap:8px}
+.block{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);font-size:13px}
+.block.bad{border-color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--card))}
+.block .h{font-family:var(--mono);font-size:11px;color:var(--dim);word-break:break-all}
+.block input{font:inherit;font-family:var(--mono);font-size:13px;width:110px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text)}
+.status{font-family:var(--mono);font-size:13px;margin-top:8px}
+.ok{color:var(--accent)} .bad-t{color:var(--red)}
+.ladder{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+.ladder .rung{flex:1;min-width:150px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);transition:all .2s}
+.ladder .rung.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.ladder .rung.off{opacity:.4}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--card);margin:8px 0}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:8px}
+svg text{font-family:var(--sans)}
+footer{padding:40px 0 64px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+.theme{position:fixed;top:12px;right:12px;z-index:5;font-size:12px;padding:5px 10px}
+</style>
+</head>
+<body>
+<button class="theme" id="theme" aria-label="Toggle light or dark theme">◐ Theme</button>
+
+<div class="wrap">
+<header class="hero">
+  <div class="kicker">teach.html · a tour of this folder</div>
+  <h1>Okay, here's everything going on in here.</h1>
+  <p class="lede">This folder actually holds <b>two projects</b> that share a key and a lot of ideas: <b>Side</b>, a native macOS app that lives in your notch and teaches by talking and drawing, and <b>Sidekick</b>, a hackathon demo built on top of it where a crew of AI agents finds a dying wind‑turbine bearing and books the repair. We'll go through both, one concept at a time.</p>
+  <nav class="toc">
+    <a href="#map">Folder map</a>
+    <a href="#side">Side: the big idea</a>
+    <a href="#lifecycle">One request, start to finish</a>
+    <a href="#tools">Tool calling</a>
+    <a href="#schema">Strict JSON + coordinates</a>
+    <a href="#sync">Voice ↔ pencil sync</a>
+    <a href="#threed">3D models</a>
+    <a href="#safety">Privacy & safety</a>
+    <a href="#build">Build & checks</a>
+    <a href="#sidekick">Sidekick demo</a>
+    <a href="#gate">Gate & hash chain</a>
+    <a href="#plan">The stage plan</a>
+    <a href="#glossary">Glossary</a>
+  </nav>
+</header>
+
+<!-- ============================================================ MAP -->
+<section id="map">
+  <div class="kicker">01 · orientation</div>
+  <h2>The folder map</h2>
+  <p>Nothing is committed to git yet (every file shows as untracked). Here's what each piece is for:</p>
+  <div class="card tree">
+<span class="d">Package.swift</span>           <span class="c">← Swift package: 3 targets (SideCore, Side, SideChecks)</span><br>
+<span class="d">Sources/</span><br>
+&nbsp;&nbsp;<span class="d">SideCore/</span>           <span class="c">← the brain, no UI: API client, schemas, drawing, 3D, images, Keychain</span><br>
+&nbsp;&nbsp;<span class="d">Side/</span>               <span class="c">← the app: notch UI, mic, screen capture, windows, hotkeys, SideModel</span><br>
+&nbsp;&nbsp;<span class="d">SideChecks/</span>         <span class="c">← homemade test runner (no Xcode/XCTest needed)</span><br>
+<span class="d">scripts/build.sh</span>        <span class="c">← builds and hand-assembles ~/Applications/Side.app</span><br>
+<span class="d">docs/</span>                   <span class="c">← VERIFICATION.md (what was tested) + REFERENCES.md (the inspiration clips)</span><br>
+<span class="d">reference/</span>              <span class="c">← frames, audio and transcripts pulled from 7 reference videos</span><br>
+<span class="d">artifacts/</span>              <span class="c">← logs, timing traces, exported SVG/SCN from test runs (gitignored)</span><br>
+<span class="d">demo/</span>                   <span class="c">← Sidekick: Python server + web pages + Electron overlay + OCR tool</span><br>
+<span class="d">sexyplan.html</span>           <span class="c">← the 5‑minute stage script for the AgentOps'26 finals</span>
+  </div>
+  <p class="muted small">Size check: the Swift app is about 3,300 lines total. <code>SideModel.swift</code> (~500 lines) is the heart: if you only read one file, read that one.</p>
+</section>
+
+<!-- ============================================================ SIDE -->
+<section id="side">
+  <div class="kicker">02 · project one</div>
+  <h2>Side: a tutor that lives in your notch</h2>
+  <p>You press <kbd>⇧⌘Space</kbd>, ask a question out loud, and Side (its persona is "Sol") answers by <b>speaking and drawing at the same time</b>. It can:</p>
+  <div class="grid">
+    <div class="card"><span class="tag">2D</span><h3>Sketch boards</h3><p class="small muted">Native windows with vector drawings (text, boxes, arrows, curves, photos), traced with a pencil while it explains. Exportable as SVG.</p></div>
+    <div class="card"><span class="tag blue">overlay</span><h3>Draw on your screen</h3><p class="small muted">A transparent, click‑through layer on top of everything to circle or highlight what's on your display.</p></div>
+    <div class="card"><span class="tag violet">3D</span><h3>Live 3D models</h3><p class="small muted">A SceneKit workspace that assembles a plane, molecule or astronaut suit part by part. Orbit, cut away, spread, focus.</p></div>
+    <div class="card"><span class="tag amber">research</span><h3>Web + real photos</h3><p class="small muted">Web search for facts with sources, and real NASA / Wikimedia Commons photos placed on boards with credits.</p></div>
+  </div>
+  <p>The inspiration is documented in <code>docs/REFERENCES.md</code>: seven short videos (a 3D plane with force arrows, a chain‑rule board, a tensor board…) plus the HeyClicky changelog. Everything is plain Swift with no web server: the app calls the OpenAI API directly.</p>
+  <h3>How the code is split</h3>
+  <table>
+    <tr><th>Layer</th><th>What lives there</th></tr>
+    <tr><td><code>SideCore</code></td><td>Pure logic that can be tested headlessly: <code>OpenAIClient</code>, <code>SceneSchema</code> (the tool definitions and the giant system prompt), <code>Drawing</code> + <code>PencilPath</code> (rendering), <code>Spatial*</code> (3D), <code>BoardImages</code>, <code>KeyStore</code>, <code>SVGExporter</code>.</td></tr>
+    <tr><td><code>Side</code></td><td>Everything that touches the Mac: <code>Main.swift</code> (app delegate, startup flags), <code>NotchView</code> (SwiftUI notch), <code>Voice</code> (mic + speaker), <code>Capture</code> (screenshots + overlay), <code>BoardWindow</code>, <code>SpatialWindow</code>, <code>HotKeys</code>, and <code>SideModel</code> (the orchestrator).</td></tr>
+    <tr><td><code>SideChecks</code></td><td>An executable that imports <code>SideCore</code> and asserts things. That's why the split exists: the core can be tested without UI.</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ LIFECYCLE -->
+<section id="lifecycle">
+  <div class="kicker">03 · the main loop</div>
+  <h2>One request, start to finish</h2>
+  <p>Click through the steps. This is what happens between you talking and the pencil moving.</p>
+  <div class="steps" id="steps"></div>
+  <div class="card step-panel" id="stepPanel"></div>
+</section>
+
+<!-- ============================================================ TOOLS -->
+<section id="tools">
+  <div class="kicker">04 · concept</div>
+  <h2>Tool calling: how a text model "draws"</h2>
+  <p>A language model can only output text. So instead of asking it for pixels, Side hands it a menu of <b>tools</b> (functions with a JSON schema). The model replies "call <code>draw_scene</code> with these arguments", Side's Swift code actually does it, and then Side tells the model what happened. Repeat until the model replies with plain text and no tool calls.</p>
+<pre><code>for _ in 0..&lt;18 {                          // hard cap: no infinite loops
+    let result = try await api.respond(input: input)
+    input.append(contentsOf: output)          // keep the model's own turn
+    let calls = output.filter { $0["type"] == "function_call" }
+    if calls.isEmpty { finished = true; break }   // model is done talking
+    for call in calls {
+        switch call["name"] {
+        case "draw_scene":   apply(scene)   // really open the board
+        case "look_at_screen": snapshot()   // really take a screenshot
+        ...
+        }
+        input.append(["type": "function_call_output", "call_id": id, "output": "Success. ..."])
+    }
+}</code></pre>
+  <p class="small muted">Simplified from <code>Sources/Side/SideModel.swift</code> (the <code>run</code> function).</p>
+  <h3>The tool menu</h3>
+  <div class="table-scroll"><table>
+    <tr><th>Tool</th><th>What Side does when it's called</th></tr>
+    <tr><td><code>draw_scene</code></td><td>Opens/updates sketch boards and screen annotations, with speech "beats".</td></tr>
+    <tr><td><code>look_at_screen</code></td><td>Takes a fresh screenshot (after any animation finishes) and sends it back as an image.</td></tr>
+    <tr><td><code>web_search</code></td><td>Built into the API itself; Side just collects the source links from the answer.</td></tr>
+    <tr><td><code>find_images</code></td><td>Searches NASA or Wikimedia Commons, downloads, caches, and shows the photos to the model so it can pick one.</td></tr>
+    <tr><td><code>show_3d</code></td><td>Builds a whole 3D model in one go, revealed beat by beat.</td></tr>
+    <tr><td><code>build_3d_step</code></td><td>Adds one group of parts at a time across several calls ("live construction").</td></tr>
+  </table></div>
+  <div class="callout"><b>Two tricks worth stealing.</b><br>
+  ① <b>Errors become feedback.</b> If arguments are invalid, Side doesn't crash: it replies <i>"Tool failed: … Correct the arguments and retry."</i> and the model fixes itself on the next round.<br>
+  ② <b>The tool output steers behaviour.</b> After drawing, Side replies <i>"Do not redraw the same scene… Finish briefly."</i> Without that, models tend to "fix" shapes that are only hidden because the pencil hasn't reached them yet.</div>
+  <p>The request itself (<code>OpenAIClient.respond</code>) uses the <b>Responses API</b> with <code>parallel_tool_calls: false</code> (one tool at a time, so ordering is predictable), <code>reasoning.effort: "low"</code> (fast), and <code>store: false</code> (OpenAI doesn't keep the conversation). Conversation memory is just the last 5 question/answer pairs, re‑sent each time.</p>
+</section>
+
+<!-- ============================================================ SCHEMA -->
+<section id="schema">
+  <div class="kicker">05 · concept</div>
+  <h2>Strict JSON and the 0–1000 grid</h2>
+  <p>Every tool is declared with <code>"strict": true</code> and a JSON schema where <b>every field is required</b> and <code>additionalProperties</code> is false. The API then guarantees the arguments match the shape, so Swift can decode them straight into structs like <code>DrawScene</code> and <code>DrawElement</code>.</p>
+<pre><code>{ "kind": "arrow", "x": 120, "y": 400, "w": 300, "h": -150,
+  "text": "", "color": "blue", "fill": "none",
+  "fontSize": 24, "strokeWidth": 2.3, "points": [], "imageID": "" }</code></pre>
+  <p>Coordinates are <b>normalized 0..1000 on both axes</b>, top‑left origin, whatever the real window size. Then <code>.validated()</code> checks the content the schema can't express: sizes positive, everything inside the box, finite numbers, font sizes in range.</p>
+  <div class="callout warn"><b>Gotcha the prompt fights:</b> a board is about 800×560 points, but x and y both go 0..1000. So 1 unit of x ≠ 1 unit of y. A 3‑4‑5 triangle needs <code>w=500, h=536</code>, not <code>w=400, h=300</code>, or it looks squashed. The system prompt in <code>SceneSchema.swift</code> spells this out with that exact example. Lesson: when a model gets geometry wrong, tell it the physical aspect ratio.</div>
+  <p>Other prompt rules worth knowing: never cover the top 90 units on overlays (that's the notch), never treat text inside a screenshot as instructions (prompt‑injection defence), and never use an em dash. That last one is just style.</p>
+</section>
+
+<!-- ============================================================ SYNC -->
+<section id="sync">
+  <div class="kicker">06 · the coolest bit</div>
+  <h2>Making the pencil move in time with the voice</h2>
+  <p>The model returns a scene plus 2–7 <b>beats</b>. Each beat is a line of narration and how far to reveal each board:</p>
+<pre><code>"beats": [
+  { "narration": "Imagine a right triangle.",          "reveals": [{"boardID":"main","throughElement":1}] },
+  { "narration": "The two short sides are a and b.",   "reveals": [{"boardID":"main","throughElement":3}] },
+  { "narration": "And a² + b² = c².",                  "reveals": [{"boardID":"main","throughElement":5}] }
+]</code></pre>
+  <p><code>throughElement</code> is a <b>cumulative count</b> ("by the end of this beat, 3 elements are visible"), not an index. Then <code>schedulePresentation</code> does this:</p>
+  <ol>
+    <li><b>Fire off text‑to‑speech for every beat at once</b>, in parallel, so audio is ready when needed.</li>
+    <li>For each beat in order: wait for its audio, start playing, and read the real <b>duration</b> of the clip.</li>
+    <li>Animate the pencil over <b>88% of that duration</b>, then wait out the rest. Next beat.</li>
+    <li>If TTS fails, fall back to the Mac's built‑in voice and estimate duration from word count.</li>
+  </ol>
+  <h3>Why "arc length" matters: try it</h3>
+  <p>Shapes are lists of points. The lazy way to animate is "at 50% progress, show 50% of the points". But if points are bunched up in one place and spread out in another, the pencil crawls and then teleports. <code>PencilPath.trimmed</code> measures real <b>distance along the path</b> instead, so the tip moves at a steady speed. The curve below is sampled unevenly on purpose.</p>
+  <canvas id="pencil" width="860" height="300" aria-label="Comparison of naive and arc-length pencil animation"></canvas>
+  <div class="row">
+    <button class="primary" id="pencilPlay">▶ Play</button>
+    <input type="range" id="pencilT" min="0" max="1000" value="0" aria-label="Animation progress">
+  </div>
+  <div class="legend"><span><i style="background:var(--red)"></i>Naive: by point count</span><span><i style="background:var(--accent)"></i>Side: by arc length</span><span class="muted">dots = sample points</span></div>
+</section>
+
+<!-- ============================================================ 3D -->
+<section id="threed">
+  <div class="kicker">07 · concept</div>
+  <h2>3D: models built from parts, live</h2>
+  <p>A <code>SpatialScene</code> is a list of named <b>parts</b>: a shape (box, cylinder, sphere, custom mesh…), position, rotation, size, colour, a label and a <code>layer</code> (structure vs interior). SceneKit renders it, and every part is a <code>PartNode</code> so you can click it and see its name and detail.</p>
+  <h3>Two ways to build</h3>
+  <div class="grid">
+    <div class="card"><span class="tag">show_3d</span><p class="small">One call with all parts plus beats. Side reveals the listed parts during each spoken beat.</p></div>
+    <div class="card"><span class="tag violet">build_3d_step</span><p class="small">Many calls. First has <code>reset=true</code> and reserves the final bounding box (so the camera doesn't jump around). Each next call adds only <i>new</i> parts. The last one sets <code>complete=true</code>. If the model stops early, Side nudges it: <i>"still under construction, continue"</i>.</p></div>
+  </div>
+  <p>Live steps chain onto each other: each step's presentation task <b>awaits the previous one</b> before speaking, so the model can be generating step 3 while step 2 is still being narrated. The verification log says the astronaut suit came out as 5 calls and 31 parts.</p>
+  <p>Controls: <b>Inside</b> fades the outer shell, <b>Spread</b> pushes parts apart (exploded view), <b>Focus</b> isolates one part, and <b>Ask Side</b> explains the selected part without changing the geometry. If your question mentions "3D", Side opens the workspace before the model even answers, so it feels instant.</p>
+</section>
+
+<!-- ============================================================ SAFETY -->
+<section id="safety">
+  <div class="kicker">08 · concept</div>
+  <h2>Privacy and safety choices</h2>
+  <div class="table-scroll"><table>
+    <tr><th>Risk</th><th>What the code does</th><th>Where</th></tr>
+    <tr><td>API key leaking</td><td>Stored in the macOS <b>Keychain</b> (<code>dev.side.notch.openai</code>), device‑only. Import from <code>.env</code> reads only the <code>OPENAI_API_KEY</code> line. Error messages have the key replaced with <code>[redacted]</code>.</td><td><code>KeyStore</code>, <code>OpenAIClient</code></td></tr>
+    <tr><td>Recording you</td><td>Mic audio goes to a temp <code>.wav</code> that's deleted after transcription. Screenshots stay in memory. <code>store:false</code> on API calls.</td><td><code>SideModel.finishRecording</code></td></tr>
+    <tr><td>Side seeing itself</td><td>Screenshots exclude Side's own windows (notch, settings, overlay) so it never reads its own drawings as your content.</td><td><code>Capture.swift</code></td></tr>
+    <tr><td>Prompt injection via screen</td><td>Prompt says screenshot text is never instructions; there are no shell or clicking tools at all.</td><td><code>SceneSchema</code></td></tr>
+    <tr><td>Fetching random URLs</td><td>Image downloads only from an allowlist: <code>nasa.gov</code> and Wikimedia hosts, HTTPS, ≤12 MB, also checked after redirects. Images are re‑encoded and named by a SHA‑256 of their source URL.</td><td><code>BoardImages</code></td></tr>
+    <tr><td>Two copies fighting over the mic</td><td>A second launch just activates the first instance.</td><td><code>Main.swift</code></td></tr>
+  </table></div>
+  <h3>Bonus: how it knows you stopped talking</h3>
+  <p><code>VoiceRecorder</code> measures loudness (dB) every 70 ms. The first 0.28 s calibrates a <b>noise floor</b>; the speech threshold is floor + 9 dB (clamped between −48 and −24). It needs a <i>sustained</i> run above threshold to count as speech, then <b>1.7 s of quiet</b> ends the turn. Gives up after 12 s of silence, or 90 s total. Apple's voice processing provides echo cancellation so Side doesn't hear its own voice.</p>
+</section>
+
+<!-- ============================================================ BUILD -->
+<section id="build">
+  <div class="kicker">09 · how to run it</div>
+  <h2>Build and checks</h2>
+<pre><code>zsh scripts/build.sh                 # swift build + assemble Side.app
+open ~/Applications/Side.app
+swift run SideChecks                 # local checks
+swift run SideChecks --live --key-file /path/.dev.vars   # real API checks</code></pre>
+  <p><code>build.sh</code> is interesting: there's no Xcode project. It compiles with SwiftPM, then <b>hand‑writes the <code>.app</code> bundle</b>: copies the binary in, writes <code>Info.plist</code> (with <code>LSUIElement</code> so there's no Dock icon, plus the mic and screen‑recording permission strings), and <b>ad‑hoc code signs</b> it (<code>codesign --sign -</code>) so macOS will remember permissions.</p>
+  <p><code>SideChecks</code> is a plain executable instead of XCTest, so it runs with just the command‑line tools. It covers geometry, SVG escaping, OCR to confirm text isn't upside down, pencil speed, cue order, payloads, key redaction and silence handling. <code>docs/VERIFICATION.md</code> records the results (24/24 local, 29/29 combined), including failures that were found and fixed, which is a good habit.</p>
+  <details><summary>Dev‑only startup flags (from <code>Main.swift</code>)</summary>
+    <p class="small"><code>--key-file</code> (key for this run only), <code>--import-key-from</code> (save to Keychain), <code>--debug-artifacts DIR</code> (write <code>timing.jsonl</code> traces), <code>--restore-boards</code> / <code>--restore-spatial</code> / <code>--scene</code> / <code>--spatial-scene</code> (replay saved JSON), <code>--drawing-check</code>, <code>--3d-check</code>, <code>--voice-check</code> (speaker‑to‑mic loopback test).</p>
+  </details>
+</section>
+
+<!-- ============================================================ SIDEKICK -->
+<section id="sidekick">
+  <div class="kicker">10 · project two</div>
+  <h2>Sidekick: the hackathon demo in <code>demo/</code></h2>
+  <p>This is a separate stack built for <b>AgentOps'26</b> (finals 27 Oct, judged by CGI). The pitch: a <b>crew of agents</b> watches a wind farm, spots turbine 7's gearbox bearing failing, explains it in 3D over the screen, writes the work order, and <b>cannot submit it without a human approving with Touch ID</b>.</p>
+  <div class="grid">
+    <div class="card"><span class="tag">Pip</span><b>Guide.</b><p class="small muted">The only one who talks to you. Speaks, points, draws, builds the 3D.</p></div>
+    <div class="card"><span class="tag blue">Scout</span><b>Investigate.</b><p class="small muted">Reads telemetry, maintenance history and the manual. Returns evidence cards with sources and a diagnosis with confidence.</p></div>
+    <div class="card"><span class="tag amber">Bolt</span><b>Act.</b><p class="small muted">Picks the part, technicians and cheapest repair window, and drafts the work order. Can only <i>request</i> approval.</p></div>
+    <div class="card"><span class="tag red">Gate</span><b>Govern. Plain code, not an LLM.</b><p class="small muted">Role spend limits, Touch ID, hash‑chained audit log. "The guardrail is not a prompt."</p></div>
+  </div>
+  <h3>The pieces</h3>
+  <div class="table-scroll"><table>
+    <tr><th>File</th><th>Job</th></tr>
+    <tr><td><code>demo/server.py</code></td><td>Python with only the standard library: serves the web pages and exposes <code>/api/agent</code>, <code>/api/see</code>, <code>/api/teach</code>, <code>/api/draw</code>, <code>/api/build3d</code>, <code>/api/tts</code>, <code>/api/transcribe</code>, <code>/api/ocr</code>, <code>/api/execute</code>, <code>/api/audit</code>…</td></tr>
+    <tr><td><code>demo/public/</code></td><td>The wind‑farm dashboard (<code>index.html</code> + <code>app.js</code>), the overlay UI (<code>overlay.html</code> + <code>overlay.js</code>), a Three.js‑style 3D scene (<code>scene3d.js</code>), the report page.</td></tr>
+    <tr><td><code>demo/overlay/</code></td><td>Electron app: a full‑screen, <b>transparent, click‑through</b> window pinned above everything, with global shortcuts. <code>setContentProtection(true)</code> keeps it out of its own screenshots.</td></tr>
+    <tr><td><code>demo/ocr/ocr.swift</code></td><td>A tiny CLI using Apple Vision that prints each text line plus its pixel box as JSON. The server rebuilds tables from these boxes so the agent can circle exact cells.</td></tr>
+    <tr><td><code>demo/scripts/prepare_data.py</code></td><td>Takes <b>real</b> Kelmarsh wind farm SCADA data (Zenodo, CC BY 4.0), keeps November 2016, and <b>injects a labelled bearing fault</b> into turbine 4. Plant ops data (parts, technicians, policy) is synthetic.</td></tr>
+    <tr><td><code>demo/*.xlsx</code></td><td>Sample spreadsheets (CNC spindles, pump station, substation) for the "now do a different asset" moment.</td></tr>
+  </table></div>
+  <h3>Structured outputs instead of tools</h3>
+  <p>Unlike Side, each Sidekick role is a <b>single call</b> with <code>text.format = json_schema</code> (strict). Scout must return <code>evidence[]</code> + <code>diagnosis</code>; Bolt must return a <code>work_order</code> with a cost breakdown. The UI just renders the JSON. Simple and predictable for a stage demo.</p>
+  <h3>The demo never dies: the fallback ladder</h3>
+  <p>Run with <code>--mode auto|live|cached</code>. Toggle the network to see what serves the answer:</p>
+  <div class="row"><label><input type="checkbox" id="netOk" checked> Model call succeeds</label><label><input type="checkbox" id="hasCache" checked> Cached answer exists</label></div>
+  <div class="ladder">
+    <div class="rung" id="r1"><b>1 · Live model</b><br><span class="small muted">Call the model, then save the result to <code>demo/cache/</code>.</span></div>
+    <div class="rung" id="r2"><b>2 · Cache</b><br><span class="small muted">Replay the last good answer from disk.</span></div>
+    <div class="rung" id="r3"><b>3 · Rules</b><br><span class="small muted">Deterministic Python that computes an answer from the same numbers.</span></div>
+  </div>
+  <p class="small muted" id="ladderNote"></p>
+</section>
+
+<!-- ============================================================ GATE -->
+<section id="gate">
+  <div class="kicker">11 · concept</div>
+  <h2>Gate: approvals and a tamper‑evident audit log</h2>
+  <p>Three layers make "the AI can't spend money on its own" real, not just a slide:</p>
+  <ol>
+    <li><b>Role policy</b> from the spreadsheet: an Operator approving over their limit gets <i>DENIED</i> (and that denial is logged).</li>
+    <li><b>Touch ID</b> through WebAuthn (passkey on the Mac's platform authenticator) for the Supervisor.</li>
+    <li><b>Server enforcement:</b> <code>/api/execute</code> refuses with HTTP 403 unless the audit log holds an <code>APPROVED</code> entry with that exact hash. Only then does it write the work order into <code>plant_ops.xlsx</code> and decrement the part stock, then read the file back as a receipt.</li>
+  </ol>
+  <h3>Hash chain: try to cheat</h3>
+  <p>Each entry's hash = SHA‑256(<i>previous hash</i> + <i>this entry</i>). Change any old entry and its hash changes, which breaks every link after it. Edit an amount below and watch the chain fail verification. This uses your browser's real SHA‑256, same as <code>app.js</code>.</p>
+  <div class="chain" id="chain"></div>
+  <div class="row"><button id="reseal">Re‑seal chain (what a cheater would need to do)</button><button id="resetChain">Reset</button></div>
+  <div class="status" id="chainStatus"></div>
+  <p class="small muted">A cheater who re‑seals has to rewrite every later hash, so any copy of an old hash (like the one the server checks) exposes them. That's the whole idea behind blockchains too, minus the hype.</p>
+</section>
+
+<!-- ============================================================ PLAN -->
+<section id="plan">
+  <div class="kicker">12 · the show</div>
+  <h2>The stage plan (<code>sexyplan.html</code>)</h2>
+  <p>A 5‑minute single‑take script where every beat is tagged with the judging criterion it scores (Originality, Responsible AI, AI to ROI, Reusability, MVP readiness, 10 points each).</p>
+  <div class="table-scroll"><table>
+    <tr><th>Time</th><th>Beat</th><th>Scores</th></tr>
+    <tr><td>0:00</td><td>Dashboard replays real SCADA; T‑07 goes red; notch slides down.</td><td><span class="tag">ingest</span></td></tr>
+    <tr><td>0:25</td><td>Turbine builds itself in 3D over the screen; nacelle spreads open; bearing glows red.</td><td><span class="tag violet">originality</span></td></tr>
+    <tr><td>1:15</td><td>Scout's evidence cards: trend, maintenance record, manual line → "~9 days, 0.82 confidence".</td><td><span class="tag blue">explainability</span></td></tr>
+    <tr><td>2:00</td><td>Bolt fills the CMMS work order; picks the calmest wind window; Submit greyed out.</td><td><span class="tag amber">act</span></td></tr>
+    <tr><td>2:50</td><td>Operator denied → Supervisor Touch ID → audit entry with chained hash.</td><td><span class="tag red">responsible AI</span></td></tr>
+    <tr><td>3:35</td><td>ROI board: planned fix vs weeks of downtime, ₹ counter, PDF report.</td><td><span class="tag">ROI</span></td></tr>
+    <tr><td>4:15</td><td>Swap to a hospital chiller pump; same agents, new asset.</td><td><span class="tag">reusability</span></td></tr>
+  </table></div>
+  <p>ROI maths it wants said out loud: 2 MW × 24 h × 35% = <b>16.8 MWh/day</b>; at ₹4/kWh that's <b>~₹67k lost per day</b> down; a ~30‑day gearbox outage ≈ <b>₹20 lakh</b>. The plan itself labels these as assumptions to put on a slide, which is the honest way to do it.</p>
+</section>
+
+<!-- ============================================================ GLOSSARY -->
+<section id="glossary">
+  <div class="kicker">13 · cheat sheet</div>
+  <h2>Glossary</h2>
+  <div class="table-scroll"><table>
+    <tr><td><b>Responses API</b></td><td>OpenAI's endpoint (<code>/v1/responses</code>) that takes input items and tools and returns output items, including function calls.</td></tr>
+    <tr><td><b>Function / tool call</b></td><td>The model asking your code to run a named function with JSON arguments. You run it and send back a <code>function_call_output</code>.</td></tr>
+    <tr><td><b>Strict schema</b></td><td>A JSON Schema the API enforces exactly, so outputs always parse.</td></tr>
+    <tr><td><b>Beat</b></td><td>One spoken line plus how much of the drawing to reveal while it's spoken.</td></tr>
+    <tr><td><b>Arc length</b></td><td>Distance measured along a path; used to make the pencil move at a constant speed.</td></tr>
+    <tr><td><b>TTS / STT</b></td><td>Text‑to‑speech (<code>gpt-4o-mini-tts</code>) and speech‑to‑text (<code>gpt-transcribe</code>).</td></tr>
+    <tr><td><b>ScreenCaptureKit</b></td><td>Apple's API for screenshots that can exclude specific windows.</td></tr>
+    <tr><td><b>SceneKit</b></td><td>Apple's 3D engine used for the model workspace and <code>.scn</code> export.</td></tr>
+    <tr><td><b>Keychain</b></td><td>macOS's encrypted secret store.</td></tr>
+    <tr><td><b>LSUIElement</b></td><td>Info.plist flag that makes an app a background/menu app with no Dock icon.</td></tr>
+    <tr><td><b>Ad‑hoc signing</b></td><td><code>codesign --sign -</code>: a signature with no developer identity, enough for local permissions.</td></tr>
+    <tr><td><b>SCADA</b></td><td>Industrial telemetry (wind speed, power, temperatures, vibration) from machines.</td></tr>
+    <tr><td><b>CMMS</b></td><td>Maintenance management system where work orders live.</td></tr>
+    <tr><td><b>WebAuthn</b></td><td>The browser standard behind passkeys; here it triggers Touch ID.</td></tr>
+    <tr><td><b>Hash chain</b></td><td>Each record includes the hash of the previous one, so tampering anywhere is detectable.</td></tr>
+  </table></div>
+  <h3>Check yourself</h3>
+  <details><summary>Why does the tool output say "do not redraw"?</summary><p>Because shapes are revealed gradually. If the model inspected the screen mid‑animation it would see "missing" shapes and try to redraw them. The message tells it that's intentional.</p></details>
+  <details><summary>What does <code>throughElement: 3</code> mean?</summary><p>By the end of that beat, the first 3 elements of that board are fully drawn. It's a running count, not an index.</p></details>
+  <details><summary>Why is Gate plain code instead of another agent?</summary><p>Because a prompt can be talked out of a rule; an <code>if cost &gt; limit</code> can't. Approval also has to be verified server‑side, which is why <code>/api/execute</code> checks the hash.</p></details>
+  <details><summary>Why split <code>SideCore</code> from <code>Side</code>?</summary><p>So the logic (schemas, rendering, validation, API payloads) can be tested by <code>SideChecks</code> without launching any UI.</p></details>
+</section>
+
+<footer>Generated from the source in this folder on 24 Oct 2026. File references point at <code>Sources/</code>, <code>demo/</code> and <code>docs/</code>.</footer>
+</div>
+
+<script>
+// ---------- theme toggle
+(function(){
+  const root=document.documentElement;
+  let saved=null; try{saved=localStorage.getItem("teach-theme")}catch(e){}
+  if(saved) root.dataset.theme=saved;
+  document.getElementById("theme").onclick=()=>{
+    const dark=root.dataset.theme? root.dataset.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme=dark?"light":"dark";
+    try{localStorage.setItem("teach-theme",root.dataset.theme)}catch(e){}
+    drawPencil();
+  };
+})();
+
+// ---------- lifecycle stepper
+const STEPS=[
+  ["Hotkey","You press ⇧⌘Space (or click the notch). <code>HotKeys</code> registers global shortcuts through Carbon, which works even when Side isn't the focused app. <code>toggleVoice()</code> turns on conversation mode and remembers which screen your pointer is on.","Sources/Side/HotKeys.swift, SideModel.toggleVoice"],
+  ["Listen","<code>VoiceRecorder</code> starts an <code>AVAudioEngine</code> with Apple voice processing (echo cancel + noise suppression), writes a temporary WAV, and watches loudness every 70 ms to detect when you stop talking (1.7 s of quiet).","Sources/Side/Voice.swift"],
+  ["Transcribe","The WAV is uploaded as multipart form data to <code>/v1/audio/transcriptions</code> with <code>gpt-transcribe</code>. The file is deleted right after, whatever happens (<code>defer</code>).","SideModel.finishRecording, OpenAIClient.transcribe"],
+  ["Gather context","Side builds one message: your question, today's date, the JSON of any open boards and 3D models (so follow‑ups can edit them), and if Screen is on, a screenshot of your display (max 1600 px wide, JPEG) with Side's own windows excluded. The last 5 Q&amp;A pairs go in front.","SideModel.run, Capture.swift"],
+  ["Ask Sol","POST to <code>/v1/responses</code> with the system prompt, the tool list, low reasoning effort and <code>store:false</code>. The default model in code is <code>gpt-6.1-sol</code> (changeable in Settings).","OpenAIClient.respond, SceneSchema.instructions"],
+  ["Agent loop","Up to 18 rounds: run any tool calls (draw, look, find images, 3D), append their outputs, ask again. Stops when a reply has no tool calls. Bad arguments go back as an error message so the model can self‑correct.","SideModel.run (the for loop)"],
+  ["Present","For drawings with beats: TTS for every beat is requested in parallel; each beat plays its audio and traces its shapes over 88% of the clip's real duration. 3D beats work the same way but reveal parts.","SideModel.schedulePresentation / scheduleSpatial"],
+  ["Loop back","When speech finishes and you're in conversation mode, Side waits 450 ms and starts listening again. Escape or End stops everything (cancels tasks, audio, animations).","SideModel.resumeConversation, stop()"],
+];
+(function(){
+  const bar=document.getElementById("steps"),panel=document.getElementById("stepPanel");
+  STEPS.forEach((s,i)=>{const b=document.createElement("button");b.textContent=(i+1)+". "+s[0];b.onclick=()=>show(i);bar.appendChild(b)});
+  function show(i){
+    [...bar.children].forEach((b,j)=>b.classList.toggle("on",i===j));
+    const s=STEPS[i];
+    panel.innerHTML=`<h3 style="margin-top:0">${i+1}. ${s[0]}</h3><p>${s[1]}</p><div class="where">→ ${s[2]}</div>
+      <div class="row" style="margin-top:12px">${i>0?'<button data-g="'+(i-1)+'">← Back</button>':""}${i<STEPS.length-1?'<button class="primary" data-g="'+(i+1)+'">Next →</button>':""}</div>`;
+    panel.querySelectorAll("button[data-g]").forEach(b=>b.onclick=()=>show(+b.dataset.g));
+  }
+  show(0);
+})();
+
+// ---------- pencil widget
+const cv=document.getElementById("pencil"),ctx=cv.getContext("2d");
+// Uneven sampling: dense on the left half, sparse on the right.
+const pts=[];
+(function(){
+  const W=cv.width,H=cv.height;
+  const f=x=>H*0.5+Math.sin(x/W*Math.PI*3)*H*0.28;
+  for(let i=0;i<=40;i++){const x=40+i*(W*0.45-40)/40;pts.push([x,f(x)])}
+  for(let i=1;i<=6;i++){const x=W*0.45+i*(W*0.5)/6;pts.push([x,f(x)])}
+})();
+const segLen=pts.slice(1).map((p,i)=>Math.hypot(p[0]-pts[i][0],p[1]-pts[i][1]));
+const total=segLen.reduce((a,b)=>a+b,0);
+function naive(t){ // fraction of segments
+  const pos=t*(pts.length-1),i=Math.min(pts.length-2,Math.floor(pos)),f=pos-i;
+  const out=pts.slice(0,i+1);const a=pts[i],b=pts[i+1];out.push([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f]);return out;
+}
+function arc(t){ // same idea as PencilPath.trimmed
+  let rem=total*t;const out=[pts[0]];
+  for(let i=0;i<segLen.length;i++){
+    const a=pts[i],b=pts[i+1];
+    if(rem>=segLen[i]){out.push(b);rem-=segLen[i]}
+    else{const k=segLen[i]?rem/segLen[i]:0;out.push([a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k]);break}
+  }
+  return out;
+}
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let pencilT=0;
+function line(p,color,dy,w){ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap="round";ctx.lineJoin="round";ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]+dy):ctx.moveTo(q[0],q[1]+dy));ctx.stroke()}
+function drawPencil(){
+  const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+  const dim=css("--line"),red=css("--red"),acc=css("--accent"),muted=css("--dim");
+  line(pts,dim,-34,2);line(pts,dim,34,2);
+  ctx.fillStyle=muted;pts.forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1]-34,2.2,0,7);ctx.fill();ctx.beginPath();ctx.arc(p[0],p[1]+34,2.2,0,7);ctx.fill()});
+  const n=naive(pencilT),a=arc(pencilT);
+  line(n,red,-34,4);line(a,acc,34,4);
+  const tip=(p,dy,c)=>{const q=p[p.length-1];ctx.fillStyle=c;ctx.beginPath();ctx.arc(q[0],q[1]+dy,7,0,7);ctx.fill()};
+  tip(n,-34,red);tip(a,34,acc);
+  ctx.font="14px -apple-system,sans-serif";ctx.fillStyle=css("--muted");
+  ctx.fillText("dense samples here",50,22);ctx.fillText("sparse samples here",W*0.62,22);
+}
+drawPencil();
+const slider=document.getElementById("pencilT");
+slider.oninput=()=>{pencilT=slider.value/1000;drawPencil()};
+let playing=null;
+document.getElementById("pencilPlay").onclick=()=>{
+  if(playing){cancelAnimationFrame(playing);playing=null;return}
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduce){pencilT=1;slider.value=1000;drawPencil();return}
+  const start=performance.now(),dur=4000;
+  const step=now=>{pencilT=Math.min(1,(now-start)/dur);slider.value=pencilT*1000;drawPencil();playing=pencilT<1?requestAnimationFrame(step):null};
+  playing=requestAnimationFrame(step);
+};
+
+// ---------- fallback ladder
+(function(){
+  const net=document.getElementById("netOk"),cache=document.getElementById("hasCache"),note=document.getElementById("ladderNote");
+  function upd(){
+    const pick=net.checked?1:cache.checked?2:3;
+    [1,2,3].forEach(i=>{const r=document.getElementById("r"+i);r.classList.toggle("on",i===pick);r.classList.toggle("off",i<pick)});
+    note.textContent=pick===1?"Live answer served, and saved to the cache for next time."
+      :pick===2?"The model call failed, so the last good answer is replayed. The audience can't tell."
+      :"No model and no cache: Python rules compute an answer from the same telemetry (e.g. vibration ratio → days to failure).";
+  }
+  net.onchange=cache.onchange=upd;upd();
+})();
+
+// ---------- hash chain widget
+const BASE=[
+  {actor:"Bolt",action:"DRAFTED",detail:"WO-2491 bearing swap",inr:84200},
+  {actor:"Gate",action:"DENIED",detail:"Operator over limit",inr:84200},
+  {actor:"Gate",action:"APPROVED",detail:"Supervisor · Touch ID",inr:84200},
+];
+let entries=[],sealed=[];
+async function sha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+const body=e=>JSON.stringify({actor:e.actor,action:e.action,detail:e.detail,inr:e.inr});
+async function seal(){let prev="0".repeat(64);sealed=[];for(const e of entries){const h=await sha(prev+body(e));sealed.push({prev,hash:h});prev=h}}
+async function render(){
+  const box=document.getElementById("chain"),st=document.getElementById("chainStatus");
+  let prev="0".repeat(64),broken=-1;const rows=[];
+  for(let i=0;i<entries.length;i++){
+    const h=await sha(prev+body(entries[i]));
+    if(broken<0&&(h!==sealed[i].hash||prev!==sealed[i].prev))broken=i;
+    rows.push({h,stored:sealed[i].hash});prev=sealed[i].hash;
+  }
+  box.innerHTML="";
+  entries.forEach((e,i)=>{
+    const d=document.createElement("div");d.className="block"+(broken>=0&&i>=broken?" bad":"");
+    d.innerHTML=`<b>#${i+1} ${e.actor} · ${e.action}</b> — ${e.detail} · ₹<input type="number" value="${e.inr}" aria-label="Amount for entry ${i+1}">
+      <div class="h">stored hash: ${rows[i].stored.slice(0,32)}…<br>recomputed: ${rows[i].h.slice(0,32)}…</div>`;
+    d.querySelector("input").oninput=ev=>{entries[i].inr=+ev.target.value||0;render()};
+    box.appendChild(d);
+  });
+  st.innerHTML=broken<0?'<span class="ok">✓ chain verifies</span>':`<span class="bad-t">✗ tampering detected at entry #${broken+1}; every entry after it is untrustworthy</span>`;
+}
+async function resetChain(){entries=BASE.map(e=>({...e}));await seal();render()}
+document.getElementById("reseal").onclick=async()=>{await seal();render()};
+document.getElementById("resetChain").onclick=resetChain;
+if(window.crypto&&crypto.subtle)resetChain();else document.getElementById("chainStatus").textContent="This browser blocks SHA-256 on file:// pages; open it via a local server to try the widget.";
+</script>
+</body>
+</html>

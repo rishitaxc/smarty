@@ -1,0 +1,26 @@
+{
+  "id": "CH-2",
+  "scenario": "chiller",
+  "title": "Chilled-water pump CH-2 · City Hospital",
+  "camera": { "pos": [9.0, 5.2, 10.0], "target": [0.2, 0.9, 0], "focusPos": [5.8, 3.4, 5.6], "focusTarget": [0.9, 1.0, 0] },
+  "parts": [
+    { "id": "skid", "label": "Base skid", "shape": "box", "args": [4.4, 0.25, 1.4], "pos": [0, 0.125, 0], "color": "#5d6b7a" },
+    { "id": "motorfeet", "shape": "box", "args": [1.3, 0.3, 0.9], "pos": [-1.1, 0.4, 0], "color": "#4a5866" },
+    { "id": "motor", "label": "Motor", "shape": "cyl", "args": [0.55, 0.55, 1.6], "pos": [-1.1, 1.0, 0], "rot": [0, 0, 1.5708], "color": "#6fa8dc" },
+    { "id": "fan", "shape": "cyl", "args": [0.5, 0.5, 0.3], "pos": [-2.05, 1.0, 0], "rot": [0, 0, 1.5708], "color": "#4d7fae" },
+    { "id": "guard", "label": "Coupling guard", "shape": "box", "args": [0.62, 0.62, 0.7], "pos": [0.12, 1.0, 0], "color": "#ffbf47", "group": "shell", "explode": [0, 1.4, 0] },
+    { "id": "coupling", "label": "Coupling", "shape": "cyl", "args": [0.18, 0.18, 0.5], "pos": [0.12, 1.0, 0], "rot": [0, 0, 1.5708], "color": "#b0bac4", "group": "internal" },
+    { "id": "bearinghousing", "label": "Bearing housing", "shape": "cyl", "args": [0.3, 0.3, 0.6], "pos": [0.68, 1.0, 0], "rot": [0, 0, 1.5708], "color": "#9fb3c8", "explode": [0.25, 0, 0] },
+    { "id": "seal", "label": "Mechanical seal", "shape": "torus", "args": [0.27, 0.075], "pos": [1.02, 1.0, 0], "rot": [0, 1.5708, 0], "color": "#ffd9d2", "group": "internal", "explode": [0.5, 0, 0] },
+    { "id": "pedestal", "shape": "box", "args": [0.7, 0.4, 0.8], "pos": [1.42, 0.45, 0], "color": "#4a5866", "explode": [0.8, 0, 0] },
+    { "id": "volute", "label": "Pump casing", "shape": "cyl", "args": [0.75, 0.75, 0.5], "pos": [1.42, 1.0, 0], "rot": [0, 0, 1.5708], "color": "#6fa8dc", "explode": [0.8, 0, 0] },
+    { "id": "suction", "label": "Suction", "shape": "cyl", "args": [0.28, 0.28, 1.2], "pos": [2.3, 1.0, 0], "rot": [0, 0, 1.5708], "color": "#9aa7b4", "explode": [0.8, 0, 0] },
+    { "id": "discharge", "label": "Discharge", "shape": "cyl", "args": [0.24, 0.24, 1.1], "pos": [1.42, 1.95, 0], "color": "#9aa7b4", "explode": [0.8, 0, 0] }
+  ],
+  "steps": [
+    { "parts": ["skid", "motorfeet", "motor", "fan"], "say": "New asset, same crew. This is the chilled-water pump that cools the hospital's MRI suite." },
+    { "parts": ["guard", "bearinghousing", "pedestal", "volute", "suction", "discharge"], "say": "Motor, coupling, bearings and the pump casing." },
+    { "parts": ["coupling", "seal"], "explode": true, "fault": true, "camera": "focus", "say": "The mechanical seal is running hot and the flow is dropping. Same pattern, different machine." }
+  ],
+  "fault": { "part": "seal", "label": "Mechanical seal · {seal_now} °C", "component": "Pump mechanical seal" }
+}
